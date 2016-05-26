@@ -16,6 +16,9 @@ import java.util.Random;
 
 /**
  * Barrier
+ * A barrier is a primitive that enables a group of processes to synchronize the beginning and the end of a computation.
+ * The general idea of this implementation is to have a barrier node that serves the purpose of being a parent for individual process nodes.
+ *
  */
 public class Barrier extends SyncPrimitive {
     int size;
@@ -78,10 +81,12 @@ public class Barrier extends SyncPrimitive {
     }
 
     public static void barrierTest(String[] args) {
-        Barrier barrier = new Barrier(args[1], "/b1", new Integer(args[2]));
+        String server = args[1];
+        int size = new Integer(args[2]);
+        Barrier barrier = new Barrier(server, "/b1", size);
         try {
             boolean flag = barrier.enter();
-            logger.info("Entered barrier: ", args[2]);
+            logger.info("Entered barrier: {}", size);
             if(!flag) {
                 logger.warn("Error when entering the barrier");
             }

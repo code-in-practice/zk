@@ -23,8 +23,7 @@ public class Queue extends SyncPrimitive{
             try {
                 Stat stat = zk.exists(root, false);
                 if (stat ==null) {
-                    zk
-                            .create(root, new byte[0], ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+                    zk.create(root, new byte[0], ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
                 }
             } catch (InterruptedException e) {
                 logger.warn("InterruptedException: ");
@@ -59,16 +58,19 @@ public class Queue extends SyncPrimitive{
                     logger.info("Going to wait");
                     mutex.wait();
                 }else {
-                    Integer min = new Integer(list.get(0).substring(element.length()));
+                    String minStr = list.get(0).substring(element.length());
+                    Integer min = new Integer(minStr);
                     for (String s: list) {
-                        Integer tempValue = new Integer(s.substring(element.length()));
+                        String tempValueStr = s.substring(element.length());
+                        Integer tempValue = new Integer(tempValueStr);
                         if (tempValue < min) {
+                            minStr = tempValueStr;
                             min = tempValue;
                         }
                     }
-                    logger.info("Temporary value: " + root + "/" + element + min);
-                    byte[] b = zk.getData(root+"/"+element+"00000000"+min, false, stat);
-                    zk.delete(root+"/"+element+"00000000"+min,0);
+                    logger.info("Temporary value: " + root + "/" + element + minStr);
+                    byte[] b = zk.getData(root+"/"+element+minStr, false, stat);
+                    zk.delete(root+"/"+element+minStr,0);
                     ByteBuffer byteBuffer = ByteBuffer.wrap(b);
                     retValue = byteBuffer.getInt();
                     return retValue;
